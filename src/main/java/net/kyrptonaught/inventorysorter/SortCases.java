@@ -6,6 +6,7 @@ import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.ItemEnchantmentsComponent;
 import net.minecraft.component.type.ProfileComponent;
 import net.minecraft.enchantment.Enchantment;
+import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.item.*;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.entry.RegistryEntry;
@@ -53,9 +54,9 @@ public class SortCases {
             return playerHeadCase(stack);
         if (stack.getCount() != stack.getMaxCount())
             return stackSize(stack);
-        if (item instanceof EnchantedBookItem)
+        if (EnchantmentHelper.hasEnchantments(stack))
             return enchantedBookNameCase(stack);
-        if (item instanceof ToolItem)
+        if (item instanceof MiningToolItem || item instanceof SwordItem || item instanceof HoeItem || item instanceof ShearsItem || item instanceof BrushItem)
             return toolDuribilityCase(stack);
         return item.toString();
     }
