@@ -6,7 +6,6 @@ import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.ItemEnchantmentsComponent;
 import net.minecraft.component.type.ProfileComponent;
 import net.minecraft.enchantment.Enchantment;
-import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.item.*;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.entry.RegistryEntry;
@@ -28,12 +27,12 @@ public class SortCases {
                 return Registries.ITEM.getId(item).getNamespace() + itemName;
             }
             case NAME -> {
-                return stack.getName() + itemName;
+                return itemName;
+            }
+            default -> {
+                return item.getName().toString();
             }
         }
-
-
-        return itemName;
     }
 
     private static ItemGroup getFirstItemGroup(ItemStack stack) {
@@ -48,21 +47,20 @@ public class SortCases {
 
     private static String specialCases(ItemStack stack) {
         Item item = stack.getItem();
-        ComponentMap component = stack.getComponents();
 
-        if (component != null && component.contains(DataComponentTypes.PROFILE))
+        if (stack.hasChangedComponent(DataComponentTypes.PROFILE))
             return playerHeadCase(stack);
         if (stack.getCount() != stack.getMaxCount())
             return stackSize(stack);
-        if (EnchantmentHelper.hasEnchantments(stack))
-            return enchantedBookNameCase(stack);
+        if (stack.getComponentChanges().get(DataComponentTypes.ENCHANTMENTS) != null)
+            return enchantedItemCase(stack);
         if (item instanceof MiningToolItem || item instanceof SwordItem || item instanceof HoeItem || item instanceof ShearsItem || item instanceof BrushItem)
             return toolDuribilityCase(stack);
-        return item.toString();
+        return item.getName().toString();
     }
 
     private static String playerHeadCase(ItemStack stack) {
-        ProfileComponent profileComponent = stack.getComponents().get(DataComponentTypes.PROFILE);
+        ProfileComponent profileComponent = stack.getComponentChanges().get(DataComponentTypes.PROFILE).get();
         String ownerName = profileComponent.name().isPresent() ? profileComponent.name().get() : stack.getItem().toString();
 
         // this is duplicated logic, so we should probably refactor
@@ -71,15 +69,15 @@ public class SortCases {
             count = Integer.toString(stack.getCount());
         }
 
-        return stack.getItem().toString() + " " + ownerName + count;
+        return stack.getItem().toString() + " " + ownerName.toLowerCase() + count;
     }
 
     private static String stackSize(ItemStack stack) {
-        return stack.getItem().toString() + stack.getCount();
+        return stack.getItem().getName().toString() + stack.getCount();
     }
 
-    private static String enchantedBookNameCase(ItemStack stack) {
-        ItemEnchantmentsComponent enchantmentsComponent = stack.getComponents().get(DataComponentTypes.STORED_ENCHANTMENTS);
+    private static String enchantedItemCase(ItemStack stack) {
+        ItemEnchantmentsComponent enchantmentsComponent = stack.getComponentChanges().get(DataComponentTypes.ENCHANTMENTS).get();
         List<String> names = new ArrayList<>();
         StringBuilder enchantNames = new StringBuilder();
         for (Object2IntMap.Entry<RegistryEntry<Enchantment>> enchant : enchantmentsComponent.getEnchantmentEntries()) {
@@ -89,11 +87,11 @@ public class SortCases {
         for (String enchant : names) {
             enchantNames.append(enchant).append(" ");
         }
-        return stack.getItem().toString() + " " + enchantmentsComponent.getSize() + " " + enchantNames;
+        return stack.getItem().getName().toString() + " " + enchantmentsComponent.getSize() + " " + enchantNames;
     }
 
     private static String toolDuribilityCase(ItemStack stack) {
-        return stack.getItem().toString() + stack.getDamage();
+        return stack.getItem().getName().toString() + stack.getDamage();
     }
 
     public enum SortType {
