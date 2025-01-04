@@ -7,6 +7,7 @@ import net.kyrptonaught.inventorysorter.InventorySorterMod;
 import net.kyrptonaught.inventorysorter.client.config.ConfigOptions;
 import net.kyrptonaught.inventorysorter.network.SyncBlacklistPacket;
 import net.kyrptonaught.inventorysorter.network.SyncInvSortSettingsPacket;
+import net.kyrptonaught.kyrptconfig.keybinding.CustomKeyBinding;
 import net.kyrptonaught.kyrptconfig.keybinding.DisplayOnlyKeyBind;
 import net.minecraft.client.util.InputUtil;
 
@@ -35,6 +36,8 @@ public class InventorySorterModClient implements ClientModInitializer {
     }
 
     public static boolean isKeybindPressed(int pressedKeyCode, InputUtil.Type type) {
-        return getConfig().keybinding.matches(pressedKeyCode, type);
+        CustomKeyBinding keybinding = getConfig().keybinding;
+        boolean matches = keybinding.matches(pressedKeyCode, type);
+        return matches;
     }
 }

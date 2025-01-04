@@ -8,6 +8,7 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.kyrptonaught.inventorysorter.InventoryHelper;
 import net.kyrptonaught.inventorysorter.SortCases;
 import net.kyrptonaught.inventorysorter.client.InventorySorterModClient;
+import net.kyrptonaught.inventorysorter.client.config.ConfigOptions;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
@@ -35,7 +36,9 @@ public record InventorySortPacket(boolean playerInv, int sortType) implements Cu
     @Environment(EnvType.CLIENT)
     public static void sendSortPacket(boolean playerInv) {
         ClientPlayNetworking.send(new InventorySortPacket(playerInv, InventorySorterModClient.getConfig().sortType.ordinal()));
-        if (!playerInv && InventorySorterModClient.getConfig().sortPlayer)
+        ConfigOptions config = InventorySorterModClient.getConfig();
+        boolean sortPlayer = config.sortPlayer;
+        if (!playerInv && sortPlayer)
             sendSortPacket(true);
     }
 

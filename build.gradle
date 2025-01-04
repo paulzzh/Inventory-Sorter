@@ -26,7 +26,7 @@ dependencies {
 	modImplementation include("net.kyrptonaught:kyrptconfig:1.6.1-1.21") { exclude group: "net.fabricmc.fabric-api" }
 
 	//update modmenu when kyrptconfig is pulling old version
-	modImplementation ("com.terraformersmc:modmenu:11.0.1"){
+	modImplementation ("com.terraformersmc:modmenu:${project.modmenu_version}"){
 		transitive(false)
 	}
 }
